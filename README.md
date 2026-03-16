@@ -1,6 +1,6 @@
 # Local Agent
 
-A terminal-based AI agent powered by the Anthropic API (Claude). It can answer questions and execute shell commands on your machine with your permission.
+An AI agent powered by the Anthropic API (Claude). It can answer questions and execute shell commands on your machine with your permission. Run it as a terminal CLI or as a local web UI accessible from any browser on your network.
 
 ## How it works
 
@@ -11,10 +11,10 @@ A terminal-based AI agent powered by the Anthropic API (Claude). It can answer q
 
 ## Setup
 
-**1. Install the dependency**
+**1. Install dependencies**
 
 ```bash
-pip install anthropic
+pip install anthropic flask
 ```
 
 **2. Set your Anthropic API key**
@@ -29,11 +29,21 @@ Get your API key at [console.anthropic.com/keys](https://console.anthropic.com/k
 
 ## Usage
 
+### Web UI (recommended)
+
+```bash
+python web.py
+```
+
+Then open your browser at `http://localhost:8080`. To access from another machine on the same network, use the **Network** URL printed in the terminal (e.g. `http://192.168.x.x:8080`).
+
+### Terminal CLI
+
 ```bash
 python local-agent.py
 ```
 
-### Example session
+### Example session (CLI)
 
 ```
 Agent running with claude-sonnet-4-6 via Anthropic. Type 'quit' to exit.
