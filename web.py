@@ -62,9 +62,16 @@ def check_command(cmd: str):
     return "ok", None
 
 
+_PLACEHOLDER = re.compile(r"^the shell command here$", re.IGNORECASE)
+
 def extract_command(text: str):
     m = re.search(r"<cmd>(.*?)</cmd>", text, re.DOTALL)
-    return m.group(1).strip() if m else None
+    if not m:
+        return None
+    cmd = m.group(1).strip()
+    if _PLACEHOLDER.match(cmd):
+        return None
+    return cmd
 
 
 def run_command(cmd: str) -> str:
@@ -223,6 +230,7 @@ HTML = """<!DOCTYPE html>
     font-size: .92rem;
     white-space: pre-wrap;
     word-break: break-word;
+    flex-shrink: 0;
   }
   .bubble.user {
     align-self: flex-end;
@@ -246,6 +254,7 @@ HTML = """<!DOCTYPE html>
     border-radius: 12px;
     overflow: hidden;
     font-size: .9rem;
+    flex-shrink: 0;
   }
   .cmd-card .cmd-header {
     padding: 8px 14px;
@@ -386,7 +395,9 @@ function setbusy(b) {
 }
 
 function scrollBottom() {
-  chat.scrollTop = chat.scrollHeight;
+  requestAnimationFrame(() => {
+    chat.scrollTop = chat.scrollHeight;
+  });
 }
 
 function addBubble(role, text) {
@@ -408,6 +419,8 @@ function addThinking() {
 }
 
 function addCmdCard(data) {
+  console.log('[addCmdCard] data:', JSON.stringify(data));
+
   const card = document.createElement('div');
   card.className = 'cmd-card ' + data.status;
 
@@ -423,7 +436,13 @@ function addCmdCard(data) {
     </div>`;
 
   chat.appendChild(card);
+  console.log('[addCmdCard] card dimensions:', card.offsetWidth, 'x', card.offsetHeight);
+  console.log('[addCmdCard] chat scrollHeight before scroll:', chat.scrollHeight, 'scrollTop:', chat.scrollTop, 'clientHeight:', chat.clientHeight);
   scrollBottom();
+  requestAnimationFrame(() => {
+    console.log('[addCmdCard] after rAF — card dimensions:', card.offsetWidth, 'x', card.offsetHeight);
+    console.log('[addCmdCard] after rAF — chat scrollHeight:', chat.scrollHeight, 'scrollTop:', chat.scrollTop);
+  });
 
   card.querySelector('.btn-approve').onclick = () => respond('/api/approve', card);
   card.querySelector('.btn-deny').onclick    = () => respondDeny(card);
